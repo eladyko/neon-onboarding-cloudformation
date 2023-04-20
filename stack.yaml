@@ -14,12 +14,6 @@ Resources:
       AttributeDefinitions:
         - AttributeName: Id
           AttributeType: S
-        - AttributeName: Isbn
-          AttributeType: S
-        - AttributeName: Title
-          AttributeType: S
-        - AttributeName: Description
-          AttributeType: S
       KeySchema:
         - AttributeName: Id
           KeyType: HASH
