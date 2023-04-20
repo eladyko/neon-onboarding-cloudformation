@@ -80,24 +80,24 @@ Resources:
               Service:
                 - ec2.amazonaws.com
             Action: 'sts:AssumeRole'
-        Policies:
-          - PolicyName: access-to-dynamodb-policy
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'dynamodb:*'
-                  Resource: !GetAtt BooksTable.Arn
-          - PolicyName: access-to-sqs-policy
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'sqs:GetQueueUrl'
-                    - 'sqs:SendMessage'
-                  Resource: !GetAtt ChangesQueue.Arn
+      Policies:
+        - PolicyName: access-to-dynamodb-policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:*'
+                Resource: !GetAtt BooksTable.Arn
+        - PolicyName: access-to-sqs-policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'sqs:GetQueueUrl'
+                  - 'sqs:SendMessage'
+                Resource: !GetAtt ChangesQueue.Arn
 
   EC2InstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'
@@ -116,21 +116,21 @@ Resources:
               Service:
                 - lambda.amazonaws.com
             Action: 'sts:AssumeRole'
-        Policies:
-          - PolicyName: 'lambda-execution-policy'
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'logs:CreateLogGroup'
-                    - 'logs:CreateLogStream'
-                    - 'logs:PutLogEvents'
-                  Resource: 'arn:aws:logs:*:*:*'
-                - Effect: Allow
-                  Action:
-                    - 's3:PutObject'
-                  Resource: !GetAtt EventStorage.Arn
+      Policies:
+        - PolicyName: 'lambda-execution-policy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: 'arn:aws:logs:*:*:*'
+              - Effect: Allow
+                Action:
+                  - 's3:PutObject'
+                Resource: !GetAtt EventStorage.Arn
       
 
 
