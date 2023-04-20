@@ -8,6 +8,9 @@ Resources:
     Type: 'AWS::DynamoDB::Table'
     Properties:
       TableName: books
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
       AttributeDefinitions:
         - AttributeName: Id
           AttributeType: S
@@ -53,7 +56,7 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       AccessControl: PublicRead
-      BucketName: lambda-code-storage_316407933015
+      BucketName: lambda-code-storage-316407933015
 
   EventHandlerServerless:
     Type: 'AWS::Lambda::Function'
@@ -71,7 +74,7 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       AccessControl: PublicRead
-      BucketName: event-storage_316407933015
+      BucketName: event-storage-316407933015
 
   ApiRole:
     Type: 'AWS::IAM::Role'
