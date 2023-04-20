@@ -1,0 +1,141 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  License: Apache-2.0
+Description: 'AWS stack for onboarding task'
+
+Resources:
+  BooksTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: books
+      AttributeDefinitions:
+        - AttributeName: Id
+          AttributeType: S
+        - AttributeName: Isbn
+          AttributeType: S
+        - AttributeName: Title
+          AttributeType: S
+        - AttributeName: Description
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+
+  EC2InstanceOnboarding:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      KeyName: ec2-onboarding
+      ImageId: ami-0474863011a7d1541
+      SecurityGroups:
+        - !Ref HTTPSecurityGroup
+
+  HTTPSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable port 80 and port 443
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        FromPort: 80
+        IpProtocol: tcp
+        ToPort: 80
+      - CidrIp: 0.0.0.0/0
+        FromPort: 443
+        IpProtocol: tcp
+        ToPort: 443
+
+  ChangesQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: BookEvents
+
+  LambdaCodeStorage:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      AccessControl: PublicRead
+      BucketName: lambda-code-storage_316407933015
+
+  EventHandlerServerless:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        S3Bucket: lambda-code-storage_316407933015
+        S3Key: BookEventHandler.zip
+      FunctionName: 'event-handler-function'
+      Handler: BookEventHandler.Function.FunctionHandler
+      Runtime: dotnet6
+      Timeout: 10
+      Role: !GetAtt HandlerRole.Arn
+
+  EventStorage:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      AccessControl: PublicRead
+      BucketName: event-storage_316407933015
+
+  ApiRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action: 'sts:AssumeRole'
+        Policies:
+          - PolicyName: access-to-dynamodb-policy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'dynamodb:*'
+                  Resource: !GetAtt BooksTable.Arn
+          - PolicyName: access-to-sqs-policy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'sqs:GetQueueUrl'
+                    - 'sqs:SendMessage'
+                  Resource: !GetAtt ChangesQueue.Arn
+
+  EC2InstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Roles:
+        - !Ref ApiRole
+
+  HandlerRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+        Policies:
+          - PolicyName: 'lambda-execution-policy'
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'logs:CreateLogGroup'
+                    - 'logs:CreateLogStream'
+                    - 'logs:PutLogEvents'
+                  Resource: 'arn:aws:logs:*:*:*'
+                - Effect: Allow
+                  Action:
+                    - 's3:PutObject'
+                  Resource: !GetAtt EventStorage.Arn
+      
+
+
+
