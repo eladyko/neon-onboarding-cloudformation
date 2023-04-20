@@ -7,7 +7,7 @@ Resources:
   BooksTable:
     Type: 'AWS::DynamoDB::Table'
     Properties:
-      TableName: books-316407933015
+      TableName: books
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
