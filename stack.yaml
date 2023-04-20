@@ -22,7 +22,6 @@ Resources:
     Type: 'AWS::EC2::Instance'
     Properties:
       InstanceType: t2.micro
-      KeyName: ec2-onboarding
       ImageId: ami-0474863011a7d1541
       SecurityGroups:
         - !Ref HTTPSecurityGroup
