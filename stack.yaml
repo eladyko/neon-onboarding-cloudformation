@@ -87,3 +87,8 @@ Outputs:
     Export:
       Name:
         !Sub '${AWS::StackName}-ChangesQueueName'
+  ChangesQueueArn:
+    Value: !GetAtt ChangesQueue.Arn
+    Export:
+      Name:
+        !Sub '${AWS::StackName}-ChangesQueueArn'
