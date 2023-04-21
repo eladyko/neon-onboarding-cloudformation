@@ -51,17 +51,25 @@ Resources:
       AccessControl: PublicRead
       BucketName: lambda-code-storage-316407933015
 
-  EventHandlerServerless:
-    Type: 'AWS::Lambda::Function'
-    Properties:
-      Code:
-        S3Bucket: !Ref LambdaCodeStorage
-        S3Key: BookEventHandler.zip
-      FunctionName: 'event-handler-function'
-      Handler: BookEventHandler.Function.FunctionHandler
-      Runtime: dotnet6
-      Timeout: 10
-      Role: !GetAtt HandlerRole.Arn
+  # EventHandlerServerless:
+  #   Type: 'AWS::Lambda::Function'
+  #   Properties:
+  #     Code:
+  #       S3Bucket: !Ref LambdaCodeStorage
+  #       S3Key: BookEventHandler.zip
+  #     FunctionName: 'event-handler-function'
+  #     Handler: BookEventHandler::BookEventHandler.Function::FunctionHandler
+  #     Runtime: dotnet6
+  #     Timeout: 10
+  #     Role: !GetAtt HandlerRole.Arn
+
+  # EventSourceMapping:
+  #   Type: AWS::Lambda::EventSourceMapping
+  #   Properties: 
+  #     BatchSize: 1
+  #     Enabled: true
+  #     EventSourceArn: !GetAtt ChangesQueue.Arn
+  #     FunctionName: !GetAtt EventHandlerServerless.FunctionName
 
   EventStorage:
     Type: 'AWS::S3::Bucket'
